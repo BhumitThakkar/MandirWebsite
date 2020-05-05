@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.password">Bhumit@123</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/shreejalarammandir_db?createDatabaseIfNotExist=true</property>
+        <property name="hibernate.connection.username">root</property>
+        
+<!--    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property> -->
+<!-- 	Error: executing DDL "create table Subscriber (id integer not null, email varchar(255), primary key (id)) type=MyISAM" via JDBC Statement.-->
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</property>
+        
+        <property name="hbm2ddl.auto">update</property>
+        <property name="show_sql">false</property>
+        
+        <mapping class="org.shreejalarammandir.model.activity.Activity"/>
+        <mapping class="org.shreejalarammandir.model.activity.SessionButton"/>
+        <mapping class="org.shreejalarammandir.model.activity.ActivityPicUrl"/>
+        <mapping class="org.shreejalarammandir.model.activity.Session"/>
+        <mapping class="org.shreejalarammandir.model.activity.SessionNote"/>
+        <mapping class="org.shreejalarammandir.model.activity.WeekOfMonth"/>
+          
+        <mapping class="org.shreejalarammandir.model.event.DayOfEvent"/>
+        <mapping class="org.shreejalarammandir.model.event.Event"/>
+        <mapping class="org.shreejalarammandir.model.event.EventButton"/>
+        <mapping class="org.shreejalarammandir.model.event.EventFlyerUrl"/>
+        <mapping class="org.shreejalarammandir.model.event.EventNote"/>
+        <mapping class="org.shreejalarammandir.model.event.EventPicUrl"/>
+        <mapping class="org.shreejalarammandir.model.event.Program"/>
+        <mapping class="org.shreejalarammandir.model.event.Seva"/>
+        <mapping class="org.shreejalarammandir.model.event.Sponsorship"/>
+        <mapping class="org.shreejalarammandir.model.event.Ticket"/>
+        
+        <mapping class="org.shreejalarammandir.model.gujaraticalender.GujaratiCalender"/>
+        
+        <mapping class="org.shreejalarammandir.model.lesson.ActivityLesson"/>
+        <mapping class="org.shreejalarammandir.model.lesson.EventLesson"/>
+        <mapping class="org.shreejalarammandir.model.lesson.GeneralLesson"/>
+        <mapping class="org.shreejalarammandir.model.lesson.Lesson"/>
+        
+        <mapping class="org.shreejalarammandir.model.mandirpeople.Authority"/>
+        <mapping class="org.shreejalarammandir.model.mandirpeople.CommitteeMember"/>
+        <mapping class="org.shreejalarammandir.model.mandirpeople.Mahraj"/>
+        <mapping class="org.shreejalarammandir.model.mandirpeople.MandirPeople"/>
+        <mapping class="org.shreejalarammandir.model.mandirpeople.Post"/>
+        <mapping class="org.shreejalarammandir.model.mandirpeople.ServicesGroup"/>
+        <mapping class="org.shreejalarammandir.model.mandirpeople.Volunteer"/>
+        <mapping class="org.shreejalarammandir.model.mandirpeople.VolunteerService"/>
+
+        <mapping class="org.shreejalarammandir.model.pooja.Pooja"/>
+        <mapping class="org.shreejalarammandir.model.pooja.PoojaNote"/>
+
+        <mapping class="org.shreejalarammandir.model.publication.Parcha"/>
+        <mapping class="org.shreejalarammandir.model.publication.Publication"/>
+ 
+        <mapping class="org.shreejalarammandir.model.subscriber.Subscriber"/>
+
+        <mapping class="org.shreejalarammandir.model.venue.Venue"/> 
+
+    </session-factory>
+</hibernate-configuration>
