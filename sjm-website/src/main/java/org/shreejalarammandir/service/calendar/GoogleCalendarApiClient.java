@@ -11,8 +11,6 @@ import java.util.Collections;
 import org.shreejalarammandir.config.GoogleCalendarProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpRequestInitializer;
@@ -30,8 +28,6 @@ import com.google.auth.oauth2.GoogleCredentials;
  * Official Google Calendar client. Service account writer, sendUpdates=none, timeouts set.
  * Bean exists only when the feature flag is on; booking flows still work with a mock in tests.
  */
-@Component
-@ConditionalOnProperty(name = "mandir.google-calendar.enabled", havingValue = "true")
 public class GoogleCalendarApiClient implements GoogleCalendarClient {
 
     private static final Logger log = LoggerFactory.getLogger(GoogleCalendarApiClient.class);
