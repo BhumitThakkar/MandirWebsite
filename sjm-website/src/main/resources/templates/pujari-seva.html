@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pujari seva</title>
+    <link rel="stylesheet" th:href="@{/css/pujari-seva.css}" href="/css/pujari-seva.css">
+</head>
+<body>
+<main class="page">
+    <h1>Standalone pujari seva</h1>
+    <p class="nav"><a href="/hall">Hall reservation</a></p>
+    <p class="flash" th:if="${success}" th:text="${success}"></p>
+    <p class="meta" th:if="${publicId}">Booking id: <span th:text="${publicId}"></span>
+        · <a th:href="@{/admin/pujari-seva/{id}(id=${publicId})}">Admin</a></p>
+    <form th:action="@{/pujari-seva}" th:object="${form}" method="post" id="pujari-seva-form">
+        <label>Date <input type="date" th:field="*{sevaDate}" required></label>
+        <label>Start <input type="time" th:field="*{startTime}" required></label>
+        <label>End <input type="time" th:field="*{endTime}" required></label>
+        <label>Selected sevas <input type="text" th:field="*{selectedSevas}" required></label>
+        <label>Venue <input type="text" th:field="*{venue}" placeholder="Mandir"></label>
+        <button type="submit">Submit seva</button>
+    </form>
+</main>
+<script th:src="@{/js/pujari-seva.js}" src="/js/pujari-seva.js"></script>
+</body>
+</html>

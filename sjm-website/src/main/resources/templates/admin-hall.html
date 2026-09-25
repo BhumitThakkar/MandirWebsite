@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin hall</title>
+    <link rel="stylesheet" th:href="@{/css/admin-hall.css}" href="/css/admin-hall.css">
+</head>
+<body>
+<main class="page">
+    <h1>Admin hall</h1>
+    <p class="flash" th:if="${success}" th:text="${success}"></p>
+    <p>publicId: <span th:text="${hall.publicId}"></span></p>
+    <p>Calendar event id: <span th:text="${hall.googleCalendarEventId} ?: '(none)'"></span></p>
+    <p>Status: <span th:text="${hall.status}"></span></p>
+    <form th:action="@{/admin/hall/{id}(id=${hall.publicId})}" th:object="${adminForm}" method="post" id="admin-hall-form">
+        <label>Title <input type="text" th:field="*{eventTitle}" required></label>
+        <label>Date <input type="date" th:field="*{reservationDate}" required></label>
+        <label>Start <input type="time" th:field="*{startTime}" required></label>
+        <label>End <input type="time" th:field="*{endTime}" required></label>
+        <label>Status
+            <select th:field="*{status}">
+                <option value="PAYMENT_VALIDATION_PENDING">PAYMENT_VALIDATION_PENDING</option>
+                <option value="SJM_CATERING_PENDING">SJM_CATERING_PENDING</option>
+                <option value="APPROVED">APPROVED</option>
+                <option value="REJECTED">REJECTED</option>
+                <option value="CANCELLED">CANCELLED</option>
+            </select>
+        </label>
+        <label>Basement
+            <select th:field="*{basement}">
+                <option value="FULL">FULL</option>
+                <option value="HALF">HALF</option>
+            </select>
+        </label>
+        <label>Guests <input type="number" th:field="*{guestCount}"></label>
+        <label class="check"><input type="checkbox" th:field="*{nonprofit}"> Nonprofit</label>
+        <label class="check"><input type="checkbox" th:field="*{sjmPujariSeva}"> Pujari</label>
+        <label>Pujari lines <input type="text" th:field="*{pujariLineTitles}"></label>
+        <label>Admin notes <input type="text" th:field="*{adminNotes}"></label>
+        <button type="submit">Save</button>
+    </form>
+    <form th:action="@{/admin/hall/{id}/catering(id=${hall.publicId})}" th:object="${cateringForm}" method="post" id="admin-hall-catering">
+        <h2>Catering approve</h2>
+        <label>Meal summary <input type="text" th:field="*{mealSummary}" required></label>
+        <button type="submit">Save catering and approve</button>
+    </form>
+    <form th:action="@{/admin/hall/{id}/catering/delete(id=${hall.publicId})}" method="post">
+        <button type="submit">Remove catering</button>
+    </form>
+    <form th:action="@{/admin/hall/{id}/delete(id=${hall.publicId})}" method="post">
+        <button type="submit" class="danger">Delete reservation</button>
+    </form>
+    <p><a href="/hall">Back to public hall</a></p>
+</main>
+<script th:src="@{/js/admin-hall.js}" src="/js/admin-hall.js"></script>
+</body>
+</html>
