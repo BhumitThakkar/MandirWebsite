@@ -3,10 +3,10 @@
 **Date:** 2026-09-24  
 **Project:** Shree Jalaram Mandir Website  
 **Status:** Owner Accept is explicit — implement this Rev  
-**Rev:** 2026-09-24i — Grok 4.6 review must-fixes (replace placeholder, `pujari_seva` DDL in CREATE TABLE, flag-off flash, catering-approve only, delete + un-cancel, CateringRepository not CateringService)  
+**Rev:** 2026-09-24j — BT_PC live verify folded in (placeholder `createCalendarEvent`, controller-after-submit, `pujari_seva`, missing CREATE TABLE column, CateringController-only approve). Builds on 2026-09-24i must-fixes.  
 **Pending item:** #4 (Mandir leftovers) — tracking only; not a technical gap  
-**Repo note:** this GitHub clone (`BhumitThakkar/MandirWebsite`) is the 2020 Hibernate WAR skeleton. The locked call sites below are the Mandir hall/pujari contracts (from live-code review of local `ShreeJalaramMandir`). Implementation lands them in `sjm-website/` so this repo has **one** writer and the real methods. Do not invent a second calendar pipeline or a second set of service names.  
-**Scope:** Google Calendar sync for Mandir **hall / catering / pujari only**. No voice/Cruiser content.
+**Repo of truth for PR:** GitHub `BhumitThakkar/MandirWebsite` (this tree). BT_PC `E:\Website\ShreeJalaramMandir` has **no `.git`**; use it as a **read-only live-code cross-check**, not as the PR source. Keep this file at `AI/implementation_plans/20260924-google-calendar-sync.md`.  
+**Scope:** Google Calendar sync for Mandir **hall / catering / pujari only**. No voice/Cruiser content. QA UI lane follows after Lab jar (Carina briefs QA). Automated tests in §9 must pass before Lab.
 
 ---
 
@@ -69,7 +69,27 @@ Read on 2026-09-25 against `BhumitThakkar/MandirWebsite` `master`:
 
 **Locked home for this feature:** Maven module `sjm-website/` — Spring Boot, schema `sjm`, the call sites in §4. The 2020 WAR is left untouched (no calendar hooks there).
 
-### 2.1 Locked domain (from live Mandir review — do not rename)
+### 2.0b BT_PC live verify (2026-09-25, read-only) — source of truth for the real Mandir app
+
+BT_PC tree `E:\Website\ShreeJalaramMandir` still has plan **Rev 2026-09-24h** (16,476 bytes) at the same path. That disk Rev is **stale**. This GitHub file is the contract.
+
+| Check | BT_PC confirmed | Lock for implement |
+|-------|-----------------|--------------------|
+| `GoogleCalendarService` | **Placeholder exists.** Returns a mock `String` id **or null**. No real Google API. | **REPLACE** it. Do not add `MandirGoogleCalendarSyncService` beside it. Never persist `CAL_…` ids. |
+| Public hall submit | `HallReservationController` calls `createCalendarEvent(saved)` **AFTER** `submitReservation` returns | **Delete that call.** Calendar moves **inside** `submitReservation` (beside email). Controller flash uses `CalendarSyncOutcome` only. |
+| `PujariSeva` table | `@Table` = **`pujari_seva`** (singular) | Never `pujari_sevas`. |
+| `google_calendar_event_id` | **Not** in `setup-sjm-website-db.sql` CREATE TABLE yet | Add it to **both** CREATE TABLE bodies. ALTER is optional one-shot only. |
+| Catering | `saveCateringAndApproveReservation` exists and is used by **`CateringController`**. **Zero** callers of `cateringService.save(` | Hook **only** the approve method. Keep `save(` unhooked. |
+
+**BT_PC merge checklist (when copying this PR onto the local Mandir tree):**
+
+1. Remove `HallReservationController`’s after-submit `createCalendarEvent(saved)` block.
+2. Delete or hollow `GoogleCalendarService.createCalendarEvent` so it is **not** a second writer.
+3. Put `syncHallCreated` inside `submitReservation`; keep email there.
+4. Add the two CREATE TABLE columns (BT_PC does not have them yet).
+5. Do **not** hook `CateringService.save`.
+
+### 2.1 Locked domain (from live Mandir review + BT_PC — do not rename)
 
 **Hall**
 - Entity: `HallReservation` — `reservationDate`, `startTime`, `endTime`, `eventTitle`, guest/contact fields, `publicId`, `status` (`ReservationStatus`: `PAYMENT_VALIDATION_PENDING` → `SJM_CATERING_PENDING` → `APPROVED` → `REJECTED` / `CANCELLED`), flags `sjmPujariSeva`, `sjmCateringSeva`, `serviceLines`, `paymentValidated`, basement `FULL` / `HALF`.
@@ -95,8 +115,11 @@ Read on 2026-09-25 against `BhumitThakkar/MandirWebsite` `master`:
 - `PujariSevaService.deleteById` — R4 `assertDeletable`, soft-cancel Google, then delete.
 - **Hall-linked pujari:** hall flag `sjmPujariSeva` + `HallReservationServiceLine` + `HallReservationPujariTitleFormatter` — details go on the **hall** event. Not a second event.
 
-**Placeholder to replace**
-- If a `GoogleCalendarService.createCalendarEvent` mock exists (returns `CAL_…`, does not persist id, called from `HallReservationController` after submit), **replace it**. Controller must **stop** being a calendar writer. Flash logic moves to the outcome of `submitReservation`.
+**Placeholder to replace (BT_PC confirmed)**
+- Live method: `GoogleCalendarService.createCalendarEvent(HallReservation saved)` → mock `String` id or `null`. **Does not** persist the id. **Does not** call Google.
+- Live caller: `HallReservationController` **after** `submitReservation`.
+- **Replace both.** `sjm-website` must not contain `createCalendarEvent`. Controller must not inject `GoogleCalendarService`. Flash logic moves to the outcome of `submitReservation`.
+- **CateringController** (live name) is the admin caller of `saveCateringAndApproveReservation`. Do not invent a second catering-approve entry point.
 
 ---
 
@@ -305,8 +328,12 @@ Application binds HTTP to `0.0.0.0:$PORT` (Render). Filesystem is ephemeral — 
 | Mapper ignore | Client DTO cannot set `googleCalendarEventId` |
 | No money / PII strings | Description builder asserts (grep/assert) |
 | Bean cycle | App boots; calendar path does **not** inject `CateringService` |
+| Replace `createCalendarEvent` | `HallReservationController` source has **no** `createCalendarEvent`; `GoogleCalendarService` has **no** placeholder method; only one writer bean |
+| CateringController | Admin approve path calls `saveCateringAndApproveReservation`; **zero** production callers of `cateringService.save(` |
+| `pujari_seva` + DDL | Entity `@Table(name = "pujari_seva")`; both CREATE TABLE bodies include `google_calendar_event_id` |
+| Flag-off context | App boots with NoOp client and **no** Google mock |
 
-Mocks for Google. Flag default false. No on-demand. No secrets in git.
+Owner lock: these automated tests **must pass**. QA UI lane is after Lab jar (Carina briefs QA). Mocks for Google. Flag default false. No on-demand. No secrets in git.
 
 ---
 
@@ -353,10 +380,11 @@ Mocks for Google. Flag default false. No on-demand. No secrets in git.
 
 | Step | Owner |
 |------|--------|
-| Accept this plan (Rev 2026-09-24i) | Explicit — Bhumit away; proceed |
+| Accept this plan (Rev 2026-09-24j) | Explicit — Bhumit away; proceed |
 | Implement (own credits, no on-demand) | Cursor |
-| Tests listed in §9 | Cursor |
-| Lab rebuild if needed | Lab |
+| Automated tests in §9 | Cursor — **must pass** |
+| Lab jar | Lab |
+| QA UI lane | After Lab; Carina briefs QA |
 | monday.com Temple item → Done | Tracking |
 
 **Implement this Rev.**
