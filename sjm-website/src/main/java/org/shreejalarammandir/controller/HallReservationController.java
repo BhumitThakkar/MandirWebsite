@@ -51,7 +51,7 @@ public class HallReservationController {
         return "redirect:/hall";
     }
 
-    String flashFor(SubmitReservationResult result) {
+    public String flashFor(SubmitReservationResult result) {
         boolean paymentApproved = Boolean.TRUE.equals(result.getReservation().getPaymentValidated());
         CalendarSyncOutcome calendar = result.getCalendarOutcome();
         if (calendar != null && calendar.isSuccess()) {
