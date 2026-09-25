@@ -1,1 +1,17 @@
 /target/
+sjm-website/target/
+
+# Local agent / editor scratch dirs (keep implementation plans committable)
+ai/*
+AI/*
+!AI/implementation_plans/
+!AI/implementation_plans/**
+cursor/*
+Cursor/*
+
+# Secrets — never commit calendar credentials
+.env
+.env.*
+google-credentials*.json
+**/google-calendar-credentials*
+**/service-account*.json

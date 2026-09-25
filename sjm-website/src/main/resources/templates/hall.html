@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hall reservation</title>
+    <link rel="stylesheet" th:href="@{/css/hall.css}" href="/css/hall.css">
+</head>
+<body>
+<main class="page">
+    <h1>Hall reservation</h1>
+    <p class="nav"><a href="/pujari-seva">Standalone pujari seva</a></p>
+    <p class="flash" th:if="${success}" th:text="${success}"></p>
+    <p class="meta" th:if="${publicId}">Booking id: <span th:text="${publicId}"></span>
+        · <a th:href="@{/admin/hall/{id}(id=${publicId})}">Admin</a></p>
+    <form th:action="@{/hall}" th:object="${form}" method="post" id="hall-form">
+        <label>Event title <input type="text" th:field="*{eventTitle}" required></label>
+        <label>Date <input type="date" th:field="*{reservationDate}" required></label>
+        <label>Start <input type="time" th:field="*{startTime}" required></label>
+        <label>End <input type="time" th:field="*{endTime}" required></label>
+        <label>Basement
+            <select th:field="*{basement}">
+                <option value="FULL">FULL</option>
+                <option value="HALF">HALF</option>
+            </select>
+        </label>
+        <label>Guest count <input type="number" th:field="*{guestCount}" min="1"></label>
+        <label class="check"><input type="checkbox" th:field="*{nonprofit}"> Nonprofit</label>
+        <label class="check"><input type="checkbox" th:field="*{sjmPujariSeva}"> SJM pujari seva</label>
+        <label>Pujari line titles <input type="text" th:field="*{pujariLineTitles}" placeholder="Ganesh puja, Satyanarayan"></label>
+        <label class="check"><input type="checkbox" th:field="*{sjmCateringSeva}"> SJM catering</label>
+        <label class="check"><input type="checkbox" th:field="*{paymentValidated}"> Payment validated</label>
+        <label>Contact name <input type="text" th:field="*{contactName}"></label>
+        <label>Contact email <input type="email" th:field="*{contactEmail}"></label>
+        <label>Contact phone <input type="tel" th:field="*{contactPhone}"></label>
+        <button type="submit">Submit reservation</button>
+    </form>
+</main>
+<script th:src="@{/js/hall.js}" src="/js/hall.js"></script>
+</body>
+</html>

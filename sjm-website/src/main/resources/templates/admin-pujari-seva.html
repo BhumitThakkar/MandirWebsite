@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin pujari seva</title>
+    <link rel="stylesheet" th:href="@{/css/admin-pujari-seva.css}" href="/css/admin-pujari-seva.css">
+</head>
+<body>
+<main class="page">
+    <h1>Admin pujari seva</h1>
+    <p class="flash" th:if="${success}" th:text="${success}"></p>
+    <p>publicId: <span th:text="${seva.publicId}"></span></p>
+    <p>Calendar event id: <span th:text="${seva.googleCalendarEventId} ?: '(none)'"></span></p>
+    <form th:action="@{/admin/pujari-seva/{id}(id=${seva.publicId})}" th:object="${adminForm}" method="post" id="admin-pujari-seva-form">
+        <label>Date <input type="date" th:field="*{sevaDate}" required></label>
+        <label>Start <input type="time" th:field="*{startTime}" required></label>
+        <label>End <input type="time" th:field="*{endTime}" required></label>
+        <label>Sevas <input type="text" th:field="*{selectedSevas}" required></label>
+        <label>Venue <input type="text" th:field="*{venue}"></label>
+        <label>Status
+            <select th:field="*{status}">
+                <option value="PENDING">PENDING</option>
+                <option value="APPROVED">APPROVED</option>
+                <option value="REJECTED">REJECTED</option>
+                <option value="CANCELLED">CANCELLED</option>
+            </select>
+        </label>
+        <label>Admin notes <input type="text" th:field="*{adminNotes}"></label>
+        <button type="submit">Save</button>
+    </form>
+    <form th:action="@{/admin/pujari-seva/{id}/delete(id=${seva.publicId})}" method="post">
+        <button type="submit" class="danger">Delete seva</button>
+    </form>
+    <p><a href="/pujari-seva">Back to public pujari</a></p>
+</main>
+<script th:src="@{/js/admin-pujari-seva.js}" src="/js/admin-pujari-seva.js"></script>
+</body>
+</html>
