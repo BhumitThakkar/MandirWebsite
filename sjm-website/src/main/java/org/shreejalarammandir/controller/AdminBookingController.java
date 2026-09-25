@@ -5,7 +5,6 @@ import org.shreejalarammandir.dto.HallReservationAdminForm;
 import org.shreejalarammandir.dto.PujariSevaAdminForm;
 import org.shreejalarammandir.model.HallReservation;
 import org.shreejalarammandir.model.PujariSeva;
-import org.shreejalarammandir.service.CateringService;
 import org.shreejalarammandir.service.HallReservationService;
 import org.shreejalarammandir.service.PujariSevaService;
 import org.springframework.stereotype.Controller;
@@ -23,15 +22,12 @@ public class AdminBookingController {
 
     private final HallReservationService hallReservationService;
     private final PujariSevaService pujariSevaService;
-    private final CateringService cateringService;
 
     public AdminBookingController(
             HallReservationService hallReservationService,
-            PujariSevaService pujariSevaService,
-            CateringService cateringService) {
+            PujariSevaService pujariSevaService) {
         this.hallReservationService = hallReservationService;
         this.pujariSevaService = pujariSevaService;
-        this.cateringService = cateringService;
     }
 
     @GetMapping("/hall/{publicId}")
@@ -74,23 +70,6 @@ public class AdminBookingController {
         hallReservationService.delete(publicId);
         redirectAttributes.addFlashAttribute("success", "Hall reservation deleted.");
         return "redirect:/hall";
-    }
-
-    @PostMapping("/hall/{publicId}/catering")
-    public String saveCatering(
-            @PathVariable String publicId,
-            @ModelAttribute("cateringForm") CateringForm form,
-            RedirectAttributes redirectAttributes) {
-        cateringService.saveCateringAndApproveReservation(publicId, form);
-        redirectAttributes.addFlashAttribute("success", "Catering saved and reservation approved.");
-        return "redirect:/admin/hall/" + publicId;
-    }
-
-    @PostMapping("/hall/{publicId}/catering/delete")
-    public String deleteCatering(@PathVariable String publicId, RedirectAttributes redirectAttributes) {
-        cateringService.deleteByHallReservationId(publicId);
-        redirectAttributes.addFlashAttribute("success", "Catering removed.");
-        return "redirect:/admin/hall/" + publicId;
     }
 
     @GetMapping("/pujari-seva/{publicId}")

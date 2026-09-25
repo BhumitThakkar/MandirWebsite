@@ -82,6 +82,23 @@ class GoogleCalendarSyncIntegrationTest extends SjmSpringTest {
     }
 
     @Test
+    void hallEditTitlePatchesSameEventId() {
+        when(googleCalendarClient.insert(any())).thenReturn("edit-evt");
+        HallReservation hall = hallReservationService.submitReservation(hallForm(true, false)).getReservation();
+
+        HallReservationAdminForm form = adminForm(ReservationStatus.APPROVED, hall);
+        form.setEventTitle("Wedding reception");
+        hallReservationService.adminUpdate(hall.getPublicId(), form);
+
+        HallReservation stored = hallReservationRepository.findByPublicId(hall.getPublicId()).orElseThrow();
+        assertThat(stored.getGoogleCalendarEventId()).isEqualTo("edit-evt");
+        ArgumentCaptor<GoogleCalendarEventRequest> captor = ArgumentCaptor.forClass(GoogleCalendarEventRequest.class);
+        verify(googleCalendarClient).patch(eq("edit-evt"), captor.capture());
+        assertThat(captor.getValue().getSummary()).contains("Wedding reception");
+        verify(googleCalendarClient, times(1)).insert(any());
+    }
+
+    @Test
     void cateringPendingKeepsEventActive() {
         when(googleCalendarClient.insert(any())).thenReturn("pending-evt");
         HallReservation stored = hallReservationService.submitReservation(hallForm(true, true)).getReservation();

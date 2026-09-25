@@ -16,8 +16,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * The only calendar writer. Replaces any placeholder that returned fake CAL_ ids.
- * Never injects CateringService. Catch-all: callers must still treat failures as non-fatal.
+ * The only calendar writer. Replaces the BT_PC placeholder that returned a mock
+ * String id or null from the public hall controller after submit. That placeholder
+ * method is deleted — do not add it back. Never injects CateringService.
  */
 @Service
 public class GoogleCalendarService {
